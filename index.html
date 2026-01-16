@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Caterix - Menu Manager (Business Owner)</title>
+  <title>Caterix - Menu Manager</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -41,20 +41,39 @@
     }
     .save-btn:hover { background: #059669; transform: translateY(-1px); box-shadow: 0 8px 25px rgba(16,185,129,0.3); }
 
-    /* Category Tabs */
-    .category-tabs {
-      display: flex; background: white; border-radius: 16px; 
-      padding: 8px; box-shadow: var(--shadow); margin: 32px 0;
-      overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none;
+    /* Category Management */
+    .category-section {
+      background: white; border-radius: 20px; padding: 24px; 
+      box-shadow: var(--shadow); margin: 32px 0;
     }
-    .category-tabs::-webkit-scrollbar { display: none; }
-    .tab-btn {
-      flex: 0 0 auto; padding: 12px 24px; margin: 0 4px; 
-      border-radius: 12px; border: none; background: transparent;
-      font-weight: 600; font-size: 0.9rem; cursor: pointer; white-space: nowrap;
-      transition: all 0.3s;
+    .category-input-group {
+      display: flex; gap: 16px; align-items: center; margin-bottom: 24px;
     }
-    .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 16px rgba(99,102,241,0.4); }
+    .category-input-group input {
+      flex: 1; padding: 14px 16px; border: 2px solid var(--border);
+      border-radius: 12px; font-size: 16px;
+    }
+    .category-input-group button {
+      padding: 14px 24px; background: var(--primary); color: white;
+      border: none; border-radius: 12px; font-weight: 600; cursor: pointer;
+    }
+
+    /* Category Chips */
+    .category-chips {
+      display: flex; flex-wrap: wrap; gap: 12px;
+    }
+    .category-chip {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 16px; border-radius: 25px; background: var(--secondary);
+      font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: 0.3s;
+      border: 2px solid transparent;
+    }
+    .category-chip:hover { background: #e0e7ff; border-color: var(--primary); }
+    .category-chip.active { background: var(--primary); color: white; }
+    .category-chip .delete-chip { 
+      color: #ef4444; font-size: 0.8rem; opacity: 0; transition: 0.3s;
+    }
+    .category-chip:hover .delete-chip { opacity: 1; }
 
     /* Content */
     .content { max-width: 1400px; margin: 0 auto; padding: 0 40px 40px; }
@@ -68,19 +87,12 @@
     .menu-item-card {
       background: white; border-radius: 20px; padding: 24px; 
       box-shadow: var(--shadow); border: 1px solid var(--border);
-      transition: all 0.3s; position: relative; cursor: move;
+      transition: all 0.3s; position: relative;
     }
     .menu-item-card:hover { 
       transform: translateY(-4px); box-shadow: var(--shadow-hover);
       border-color: var(--primary);
     }
-    .drag-handle {
-      position: absolute; top: 16px; right: 16px; 
-      background: var(--secondary); padding: 8px; border-radius: 8px;
-      cursor: grab; opacity: 0; transition: 0.3s;
-    }
-    .menu-item-card:hover .drag-handle { opacity: 1; }
-    .drag-handle:active { cursor: grabbing; }
 
     /* Image Upload */
     .image-upload {
@@ -104,21 +116,13 @@
       display: block; font-size: 0.85rem; font-weight: 600; 
       color: var(--text); margin-bottom: 8px; 
     }
-    .form-group input, .form-group select, .form-group textarea {
+    .form-group input, .form-group select {
       width: 100%; padding: 14px 16px; border: 2px solid var(--border);
       border-radius: 12px; font-size: 16px; font-family: inherit;
       transition: border-color 0.3s; background: white;
     }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    .form-group input:focus, .form-group select:focus {
       outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
-    }
-    .form-group textarea { resize: vertical; min-height: 80px; }
-
-    /* Category Badge */
-    .category-badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 6px 12px; border-radius: 20px; font-size: 0.8rem;
-      font-weight: 600; background: var(--secondary);
     }
 
     /* Action Buttons */
@@ -130,10 +134,9 @@
       flex: 1; padding: 12px 20px; border-radius: 12px;
       border: none; font-weight: 600; cursor: pointer;
       font-size: 0.9rem; transition: all 0.3s;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
     }
     .btn-primary { background: var(--primary); color: white; }
-    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .btn-primary:hover { background: var(--primary-dark); }
     .btn-danger { background: #fee2e2; color: #dc2626; }
     .btn-danger:hover { background: #fecaca; }
 
@@ -150,12 +153,10 @@
     .add-section i { font-size: 56px; color: var(--text-muted); margin-bottom: 20px; }
 
     /* Responsive */
-    @media (max-width: 1024px) { .menu-grid { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); } }
     @media (max-width: 768px) {
       .content { padding: 0 20px 20px; }
       .header { padding: 20px 24px; }
       .header-title { font-size: 1.5rem; }
-      .category-tabs { flex-wrap: wrap; }
     }
   </style>
 </head>
@@ -170,23 +171,21 @@
         <i class="fas fa-save"></i> Save Menu
       </button>
     </div>
-    <p style="color: var(--text-muted); font-size: 0.95rem;">Organize by category • Upload high-quality images • Drag to reorder</p>
   </header>
 
   <div class="content">
-    <!-- Category Tabs -->
-    <div class="category-tabs">
-      <button class="tab-btn active" data-category="all">All Items</button>
-      <button class="tab-btn" data-category="Best Sellers">Best Sellers</button>
-      <button class="tab-btn" data-category="Soups and Salads">Soups and Salads</button>
-      <button class="tab-btn" data-category="Appetizers">Appetizers</button>
-      <button class="tab-btn" data-category="Momos">Momos</button>
-      <button class="tab-btn" data-category="Himalayan Special">Himalayan Special</button>
-      <button class="tab-btn" data-category="Entrees">Entrees</button>
-      <button class="tab-btn" data-category="Tandoori">Tandoori</button>
-      <button class="tab-btn" data-category="Stir Fry Noodle and Rice">Stir Fry Noodle and Rice</button>
-      <button class="tab-btn" data-category="Side Orders">Side Orders</button>
-      <button class="tab-btn" data-category="Dessert">Dessert</button>
+    <!-- Custom Category Management -->
+    <div class="category-section">
+      <div class="category-input-group">
+        <input type="text" id="newCategoryInput" placeholder="Add new category (e.g. 'Vegan Specials')" maxlength="25">
+        <button onclick="addCategory()">
+          <i class="fas fa-plus"></i> Add Category
+        </button>
+      </div>
+      
+      <div class="category-chips" id="categoryChips">
+        <!-- Dynamic categories will appear here -->
+      </div>
     </div>
 
     <!-- Menu Grid -->
@@ -198,70 +197,104 @@
     <div class="add-section" onclick="addNewItem()">
       <i class="fas fa-plus-circle"></i>
       <h3>Add New Menu Item</h3>
-      <p>Click to add your first dish or catering package</p>
+      <p>Click to add dish to selected category</p>
     </div>
   </div>
 
   <script>
     let menuItems = [];
-    let currentCategory = 'all';
+    let categories = ['Best Sellers', 'Appetizers', 'Momos']; // Owner can add more
+    let selectedCategory = categories[0];
 
-    const categories = [
-      'Best Sellers', 'Soups and Salads', 'Appetizers', 'Momos', 
-      'Himalayan Special', 'Entrees', 'Tandoori', 
-      'Stir Fry Noodle and Rice', 'Side Orders', 'Dessert'
-    ];
+    // Category management
+    function renderCategories() {
+      const chipsContainer = document.getElementById('categoryChips');
+      chipsContainer.innerHTML = categories.map((category, index) => `
+        <div class="category-chip ${selectedCategory === category ? 'active' : ''}" onclick="selectCategory('${category}')">
+          ${category}
+          <span class="delete-chip" onclick="deleteCategory(${index}, event)">×</span>
+        </div>
+      `).join('');
+    }
 
-    // Category tabs
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentCategory = btn.dataset.category;
+    function addCategory() {
+      const input = document.getElementById('newCategoryInput');
+      const newCat = input.value.trim();
+      if (newCat && !categories.includes(newCat) && newCat.length <= 25) {
+        categories.push(newCat);
+        input.value = '';
+        renderCategories();
+        selectCategory(newCat);
+      }
+    }
+
+    function deleteCategory(index, event) {
+      event.stopPropagation();
+      if (categories.length > 1) {
+        categories.splice(index, 1);
+        // Move items to first category if deleted
+        menuItems.forEach(item => {
+          if (item.category === categories[index]) {
+            item.category = categories[0];
+          }
+        });
+        renderCategories();
         renderMenuItems();
-      });
+      }
+    }
+
+    function selectCategory(category) {
+      selectedCategory = category;
+      document.querySelectorAll('.category-chip').forEach(chip => chip.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      renderMenuItems();
+    }
+
+    // Enter key to add category
+    document.getElementById('newCategoryInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') addCategory();
     });
 
-    // Add new item
+    // Add new item (NOW WORKS!)
     function addNewItem() {
+      if (!selectedCategory) {
+        alert('Please select or create a category first');
+        return;
+      }
+      
       const newId = Date.now();
       menuItems.unshift({
         id: newId,
         name: '',
         price: '',
-        category: categories[0],
+        category: selectedCategory,
         image: '',
         description: ''
       });
       renderMenuItems();
     }
 
-    // Render menu items
+    // Render menu items for selected category
     function renderMenuItems() {
       const grid = document.getElementById('menuGrid');
       
-      let filteredItems = currentCategory === 'all' ? menuItems : 
-        menuItems.filter(item => item.category === currentCategory);
-
+      let filteredItems = menuItems.filter(item => item.category === selectedCategory);
+      
       if (filteredItems.length === 0) {
         grid.innerHTML = `
           <div class="menu-item-card" style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">
             <i class="fas fa-utensils" style="font-size: 64px; margin-bottom: 24px; opacity: 0.5;"></i>
-            <h3>No items in this category</h3>
-            <p>Click "Add New Menu Item" to create your first dish</p>
+            <h3>No items in ${selectedCategory}</h3>
+            <p>Add your first menu item to this category</p>
           </div>
         `;
         return;
       }
 
       grid.innerHTML = filteredItems.map((item, index) => {
-        const globalIndex = menuItems.indexOf(item);
+        const globalIndex = menuItems.findIndex(i => i.id === item.id);
         return `
-          <div class="menu-item-card" draggable="true" ondragstart="dragStart(${globalIndex})" ondrop="drop(${globalIndex})" ondragover="allowDrop(event)">
-            <div class="drag-handle">
-              <i class="fas fa-grip-vertical"></i>
-            </div>
-            
+          <div class="menu-item-card">
             <label for="image-${item.id}" class="image-upload">
               ${item.image ? `<img src="${item.image}" alt="${item.name}">` : `
                 <div class="upload-placeholder">
@@ -289,24 +322,15 @@
             
             <div class="form-row">
               <div class="form-group">
+                <label>Description</label>
+                <textarea placeholder="Describe ingredients, servings, etc." onchange="updateField(${globalIndex}, 'description', this.value)">${item.description}</textarea>
+              </div>
+              <div class="form-group">
                 <label>Category</label>
                 <select onchange="updateField(${globalIndex}, 'category', this.value)">
-                  ${categories.map(cat => 
-                    `<option value="${cat}" ${item.category === cat ? 'selected' : ''}>${cat}</option>`
-                  ).join('')}
+                  ${categories.map(cat => `<option value="${cat}" ${item.category === cat ? 'selected' : ''}>${cat}</option>`).join('')}
                 </select>
               </div>
-              <div style="align-self: end;">
-                <div class="category-badge">
-                  <i class="fas fa-tag"></i> ${item.category}
-                </div>
-              </div>
-            </div>
-            
-            <div class="form-group">
-              <label>Description</label>
-              <textarea placeholder="Describe your dish (ingredients, servings, etc.)">${item.description}</textarea>
-              onchange="updateField(${globalIndex}, 'description', this.value)"
             </div>
             
             <div class="item-actions">
@@ -344,28 +368,14 @@
       }
     }
 
-    // Drag & Drop
-    function dragStart(index) { event.dataTransfer.setData('text', index); }
-    function allowDrop(e) { e.preventDefault(); }
-    function drop(index) {
-      const draggedIndex = parseInt(event.dataTransfer.getData('text'));
-      if (draggedIndex !== index) {
-        const draggedItem = menuItems[draggedIndex];
-        menuItems.splice(draggedIndex, 1);
-        menuItems.splice(index, 0, draggedItem);
-        renderMenuItems();
-      }
-    }
-
     // Save menu
     function saveMenu() {
-      console.log('Saving menu:', menuItems);
-      // In real app: POST to /api/menu
-      alert('✅ Menu saved successfully!\n\n' + menuItems.length + ' items updated across ' + 
-            new Set(menuItems.map(i => i.category)).size + ' categories');
+      console.log('Saving menu:', { categories, menuItems });
+      alert(`✅ Menu saved!\n\n${categories.length} categories\n${menuItems.length} items`);
     }
 
-    // Initial render
+    // Initial setup
+    renderCategories();
     renderMenuItems();
   </script>
 </body>
