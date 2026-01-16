@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caterix | Online Catering Orders</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f9fafb; color: #111827; }
+    header { background: #111827; color: white; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { font-size: 1.4rem; }
+    header span { font-size: 0.9rem; opacity: 0.85; }
+
+    .layout { display: grid; grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr); gap: 24px; padding: 24px; max-width: 1200px; margin: 0 auto; }
+    @media(max-width: 900px){ .layout{ grid-template-columns: 1fr; } }
+
+    .panel { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+
+    .toggle-group { display: inline-flex; border-radius: 999px; background: #e5e7eb; padding: 4px; margin-bottom: 16px; }
+    .toggle-btn { border: none; background: transparent; padding: 6px 16px; border-radius: 999px; font-size: 0.9rem; cursor: pointer; }
+    .toggle-btn.active { background: #111827; color: white; }
+
+    .info-row { display: flex; flex-wrap: wrap; gap: 12px; font-size: 0.85rem; color: #4b5563; margin-bottom: 16px; }
+
+    .section-title { font-size: 1.1rem; font-weight: 600; margin: 20px 0 8px; }
+    .menu-section { margin-bottom: 16px; }
+
+    .menu-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
+    .menu-item:last-child { border-bottom: none; }
+    .menu-item h4 { font-size: 0.95rem; margin-bottom: 4px; }
+    .menu-item p { font-size: 0.8rem; color: #6b7280; }
+    .menu-actions { text-align: right; min-width: 120px; }
+    .price { font-weight: 600; font-size: 0.9rem; margin-bottom: 6px; }
+    .btn-sm { padding: 4px 10px; border-radius: 999px; border: 1px solid #111827; background: white; cursor: pointer; font-size: 0.75rem; }
+
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 12px; margin-top: 12px; }
+    label { font-size: 0.8rem; color: #4b5563; display: block; margin-bottom: 4px; }
+    input, textarea, select { width: 100%; padding: 8px 10px; font-size: 0.85rem; border-radius: 8px; border: 1px solid #d1d5db; }
+    textarea { resize: vertical; min-height: 60px; }
+
+    /* Cart */
+    .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .cart-items { max-height: 260px; overflow-y: auto; margin-bottom: 12px; }
+    .cart-item { display: flex; justify-content: space-between; font-size: 0.85rem; padding: 4px 0; }
+    .cart-item span.qty { color: #6b7280; }
+    .totals { font-size: 0.85rem; border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 8px; }
+    .totals-row { display: flex; justify-content: space-between; margin: 2px 0; }
+    .totals-row.total { font-weight: 700; }
+
+    .primary-btn { width: 100%; margin-top: 12px; padding: 10px 14px; border-radius: 999px; background: #111827; color: white; border: none; font-size: 0.9rem; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Caterix</h1>
+      <span>Premium catering for Newtown & surrounding areas</span>
+    </div>
+    <span>Call: (555) 555-1234</span>
+  </header>
+
+  <main class="layout">
+    <!-- LEFT: Service & Menu -->
+    <section class="panel">
+      <!-- Service mode -->
+      <div class="toggle-group" id="serviceToggle">
+        <button class="toggle-btn active" data-mode="pickup">Pickup</button>
+        <button class="toggle-btn" data-mode="delivery">Delivery</button>
+        <button class="toggle-btn" data-mode="onsite">On-site Catering</button>
+      </div>
+
+      <div class="info-row" id="serviceInfo">
+        <span>📍 Pickup from Newtown, CT</span>
+        <span>⏰ Ready in ~48 hours</span>
+        <span>👥 Minimum 10 guests</span>
+      </div>
+
+      <!-- Event details -->
+      <div class="form-grid">
+        <div>
+          <label>Event date</label>
+          <input type="date" id="eventDate">
+        </div>
+        <div>
+          <label>Time window</label>
+          <select id="eventTime">
+            <option>11:00 AM - 1:00 PM</option>
+            <option>1:00 PM - 3:00 PM</option>
+            <option>6:00 PM - 8:00 PM</option>
+          </select>
+        </div>
+        <div>
+          <label>Guest count</label>
+          <input type="number" id="guests" min="10" value="20">
+        </div>
+      </div>
+
+      <!-- MENU -->
+      <h3 class="section-title">Starters</h3>
+      <div class="menu-section">
+        <div class="menu-item">
+          <div>
+            <h4>Veggie Platter</h4>
+            <p>Seasonal vegetables with herb dip. Serves ~10.</p>
+          </div>
+          <div class="menu-actions">
+            <div class="price">$45 / tray</div>
+            <button class="btn-sm" onclick="addToCart('Veggie Platter',45)">Add</button>
+          </div>
+        </div>
+        <div class="menu-item">
+          <div>
+            <h4>Chicken Momos</h4>
+            <p>Steamed dumplings with spicy tomato chutney. 40 pieces.</p>
+          </div>
+          <div class="menu-actions">
+            <div class="price">$60 / tray</div>
+            <button class="btn-sm" onclick="addToCart('Chicken Momos',60)">Add</button>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-title">Mains</h3>
+      <div class="menu-section">
+        <div class="menu-item">
+          <div>
+            <h4>Butter Chicken</h4>
+            <p>Rich tomato cream sauce. Serves ~10 with rice.</p>
+          </div>
+          <div class="menu-actions">
+            <div class="price">$95 / tray</div>
+            <button class="btn-sm" onclick="addToCart('Butter Chicken',95)">Add</button>
+          </div>
+        </div>
+        <div class="menu-item">
+          <div>
+            <h4>Chana Masala (Vegan)</h4>
+            <p>Slow-cooked chickpeas with tomatoes & spices.</p>
+          </div>
+          <div class="menu-actions">
+            <div class="price">$80 / tray</div>
+            <button class="btn-sm" onclick="addToCart('Chana Masala',80)">Add</button>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-title">Desserts</h3>
+      <div class="menu-section">
+        <div class="menu-item">
+          <div>
+            <h4>Gulab Jamun</h4>
+            <p>Warm milk dumplings in cardamom syrup. 40 pieces.</p>
+          </div>
+          <div class="menu-actions">
+            <div class="price">$45 / tray</div>
+            <button class="btn-sm" onclick="addToCart('Gulab Jamun',45)">Add</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Cart & customer details -->
+    <aside class="panel">
+      <div class="cart-header">
+        <h3>Your Catering Request</h3>
+        <span id="modeLabel">Pickup</span>
+      </div>
+
+      <div class="cart-items" id="cartItems">
+        <p style="font-size:0.85rem;color:#6b7280;">No items yet. Add trays from the menu.</p>
+      </div>
+
+      <div class="totals">
+        <div class="totals-row">
+          <span>Subtotal</span><span id="subtotal">$0.00</span>
+        </div>
+        <div class="totals-row">
+          <span>Service fee</span><span id="fee">$0.00</span>
+        </div>
+        <div class="totals-row total">
+          <span>Estimated total</span><span id="total">$0.00</span>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:16px;">Event & Contact</div>
+      <div class="form-grid">
+        <div>
+          <label>Your name</label>
+          <input type="text" id="name">
+        </div>
+        <div>
+          <label>Email</label>
+          <input type="email" id="email">
+        </div>
+        <div>
+          <label>Phone</label>
+          <input type="tel" id="phone">
+        </div>
+        <div>
+          <label>Event address (for delivery/on‑site)</label>
+          <input type="text" id="address" placeholder="Street, city">
+        </div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <label>Special instructions</label>
+        <textarea id="notes" placeholder="Dietary needs, schedule, setup details..."></textarea>
+      </div>
+
+      <button class="primary-btn" onclick="submitRequest()">Request Catering Quote</button>
+    </aside>
+  </main>
+
+  <script>
+    const cart = [];
+    const cartItemsEl = document.getElementById('cartItems');
+    const subtotalEl = document.getElementById('subtotal');
+    const feeEl = document.getElementById('fee');
+    const totalEl = document.getElementById('total');
+    const modeLabel = document.getElementById('modeLabel');
+    const serviceInfo = document.getElementById('serviceInfo');
+
+    function renderCart() {
+      if (cart.length === 0) {
+        cartItemsEl.innerHTML = '<p style="font-size:0.85rem;color:#6b7280;">No items yet. Add trays from the menu.</p>';
+        subtotalEl.textContent = '$0.00';
+        feeEl.textContent = '$0.00';
+        totalEl.textContent = '$0.00';
+        return;
+      }
+      cartItemsEl.innerHTML = '';
+      let subtotal = 0;
+      cart.forEach((item, index) => {
+        subtotal += item.price * item.qty;
+        const row = document.createElement('div');
+        row.className = 'cart-item';
+        row.innerHTML = `
+          <div>${item.name} <span class="qty">× ${item.qty}</span></div>
+          <div>
+            $${(item.price * item.qty).toFixed(2)}
+            <button class="btn-sm" style="margin-left:6px;" onclick="changeQty(${index},-1)">-</button>
+            <button class="btn-sm" onclick="changeQty(${index},1)">+</button>
+          </div>
+        `;
+        cartItemsEl.appendChild(row);
+      });
+
+      const fee = subtotal * 0.08; // 8% service fee example
+      const total = subtotal + fee;
+
+      subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
+      feeEl.textContent = `$${fee.toFixed(2)}`;
+      totalEl.textContent = `$${total.toFixed(2)}`;
+    }
+
+    function addToCart(name, price) {
+      const existing = cart.find(i => i.name === name);
+      if (existing) { existing.qty += 1; }
+      else { cart.push({ name, price, qty: 1 }); }
+      renderCart();
+    }
+
+    function changeQty(index, delta) {
+      cart[index].qty += delta;
+      if (cart[index].qty <= 0) cart.splice(index, 1);
+      renderCart();
+    }
+
+    // Service mode toggle
+    document.querySelectorAll('#serviceToggle .toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#serviceToggle .toggle-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const mode = btn.dataset.mode;
+        modeLabel.textContent = mode === 'pickup' ? 'Pickup' : mode === 'delivery' ? 'Delivery' : 'On‑site';
+        if (mode === 'pickup') {
+          serviceInfo.innerHTML = '<span>📍 Pickup from Newtown, CT</span><span>⏰ Ready in ~48 hours</span><span>👥 Minimum 10 guests</span>';
+        } else if (mode === 'delivery') {
+          serviceInfo.innerHTML = '<span>🚚 Delivery within 15 miles of Newtown</span><span>⏰ Choose your 2‑hour window</span><span>👥 Minimum 20 guests</span>';
+        } else {
+          serviceInfo.innerHTML = '<span>👨‍🍳 On‑site catering with staff</span><span>⏰ 3‑hour service window</span><span>👥 Minimum 30 guests</span>';
+        }
+      });
+    });
+
+    function submitRequest() {
+      const data = {
+        mode: modeLabel.textContent,
+        cart,
+        eventDate: document.getElementById('eventDate').value,
+        eventTime: document.getElementById('eventTime').value,
+        guests: document.getElementById('guests').value,
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        address: document.getElementById('address').value,
+        notes: document.getElementById('notes').value
+      };
+      console.log('Catering request:', data);
+      alert('Thank you! Your catering request has been captured in the console.\nConnect this to a backend or email service next.');
+    }
+  </script>
+</body>
+</html>
